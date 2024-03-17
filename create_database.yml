@@ -1,0 +1,14 @@
+---
+- name: Create a new database
+  hosts: database
+  vars:
+    db_name: newton_ansible_test
+    db_user: root
+    db_password: docker
+  tasks:
+    - name: Create a new database
+      mysql_db:
+        name: "{{ db_name }}"
+        state: present
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_password }}"
