@@ -1,6 +1,6 @@
 ---
 - name: Create a new database
-  hosts: database
+  hosts: db
   vars:
     db_name: newton_ansible_test
     db_user: root

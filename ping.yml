@@ -1,5 +1,6 @@
 ---
 - name: Ping host
+  hosts: db
   tasks:
     - name: Example from an Ansible Playbook
       ansible.builtin.ping:
