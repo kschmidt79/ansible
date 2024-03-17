@@ -1,0 +1,55 @@
+---
+- name: Create a new database
+  hosts: db
+  vars:
+    db_name: newton_ansible_test
+    db_user: root
+    db_password: docker
+  tasks:
+    - name: Create a new database
+      mysql_db:
+        name: "{{ db_name }}"
+        state: present
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_password }}"
+    - name: Create database user with password and all privileges
+      community.mysql.mysql_user:
+        name: newton_ansible_test_admin
+        password: '12345'
+        host: '%'
+        priv: '*.*:ALL'
+        state: present
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_password }}"
+- name: Create root folder
+  hosts: php-apache
+  vars:
+    root_folder: /storage/newton_ansible_test
+  tasks:
+    - name: Create root folder
+      file:
+        path: "{{ root_folder }}"
+        state: directory
+        mode: 0755
+        owner: www-data
+        group: www-data
+- name: Create cronjob
+  hosts: php-apache
+  vars:
+    cronjob_name: "bp_saas_queue"
+    cronjob_command: "echo 'hello world' >> /tmp/{{ productClientDetailId }}.txt"
+    productClientDetailId: 1
+  tasks:
+    - name: Create cronjob
+      cron:
+        name: "{{ cronjob_name }}"
+        minute: "*/1"
+        hour: "*"
+        job: "{{ cronjob_command }}"
+        user: www-data
+        state: present
+- name: Executing bp_migrations -v
+  hosts: php-apache
+  tasks:
+    - name: Executing bp_migrations -v
+      shell: sudo -Hu www-data /bin/bash -l -c "cd /var/www/html/newton/www && bin/cake bp_migrations -v"

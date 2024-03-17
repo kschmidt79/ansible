@@ -1,0 +1,1 @@
+*  *  *  *  *  www-data cd /var/www/html/newton/www && bin/cake bp_saas_queue run -q --productClientDetail {{ productClientDetailId }}';

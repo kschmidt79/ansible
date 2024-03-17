@@ -1,0 +1,46 @@
+---
+- name: Remove database
+  hosts: db
+  vars:
+    db_name: newton_ansible_test
+    db_user: root
+    db_password: docker
+  tasks:
+    - name: Drop database
+      mysql_db:
+        name: "{{ db_name }}"
+        state: absent
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_password }}"
+    - name: Create database user with password and all privileges
+      community.mysql.mysql_user:
+        name: newton_ansible_test_admin
+        host: '%'
+        priv: '*.*:ALL'
+        state: absent
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_password }}"
+- name: delete root folder
+  hosts: php-apache
+  vars:
+    root_folder: /storage/newton_ansible_test
+  tasks:
+    - name: Create root folder
+      file:
+        path: "{{ root_folder }}"
+        state: absent
+- name: Delete cronjob
+  hosts: php-apache
+  vars:
+    cronjob_name: "bp_saas_queue"
+    cronjob_command: "echo 'hello world' >> /tmp/{{ productClientDetailId }}.txt"
+    productClientDetailId: 1
+  tasks:
+    - name: Create cronjob
+      cron:
+        name: "{{ cronjob_name }}"
+        minute: "*/1"
+        hour: "*"
+        job: "{{ cronjob_command }}"
+        user: www-data
+        state: absent
